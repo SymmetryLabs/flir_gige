@@ -9,6 +9,7 @@
 
 #include <PvGenParameterArray.h>
 #include <PvGenParameter.h>
+#include <PvGenEnum.h>
 
 namespace flir_gige {
 
@@ -21,11 +22,19 @@ FlirGige::FlirGige(const std::string &ip_address)
                              result.GetCodeString().GetAscii());
   }
   const PvDeviceInfoGEVVec dinfo_gev_vec = GatherGevDevice();
-  if (!FindDevice(ip_address, dinfo_gev_vec)) {
-    throw std::runtime_error(ip_address +
-                             " not found. Available IP Address(es): " +
-                             AvailableDevice(dinfo_gev_vec));
+
+  if (ip_address == "0.0.0.0") {
+    std::string first_address = FirstDeviceIPAddress(dinfo_gev_vec);
+    if (!first_address.empty() && FindDevice(first_address, dinfo_gev_vec)) {
+      ip_address_ = first_address;
+      return;
+    }
   }
+  else if (FindDevice(ip_address, dinfo_gev_vec))
+    return;
+
+  throw std::runtime_error(ip_address + " not found. Available IP Address(es): " +
+                           AvailableDevice(dinfo_gev_vec));
 }
 
 void FlirGige::Connect() {
@@ -118,6 +127,13 @@ bool FlirGige::FindDevice(const std::string &ip,
   if (!result.IsOK()) return false;
   PvDevice::Free(device);
   return true;
+}
+
+std::string FlirGige::FirstDeviceIPAddress(
+    const PvDeviceInfoGEVVec &dinfo_gev_vec) const {
+  for (const PvDeviceInfoGEV *dinfo : dinfo_gev_vec)
+    return dinfo->GetIPAddress().GetAscii();
+  return "";
 }
 
 std::string FlirGige::AvailableDevice(
@@ -244,6 +260,28 @@ void FlirGige::CacheParams() {
   param_array_->GetIntegerValue("Width", width);
   param_array_->GetIntegerValue("Height", height);
 
+  // PvGenEnum *lBitPawmeter = dynamic_cast<PvGenEnum *>( param_array_->Get("DigitalOutput"));
+
+  // if ( lBitParameter == NULL )
+  // {
+  //     ROS_INFO("Unable to get the bit enum.");
+  // } else {
+  //   ROS_INFO("GOT BIT ENUM");
+  // }
+
+  // // Change bit value.
+  // int64_t new_bit = 3;
+  // if ( !lBitParameter->SetValue( new_bit ).IsOK() )
+  // {
+  //   ROS_INFO("Unable to change the bit enum.");
+  // } else {
+  //   ROS_INFO("CHANGED BIT ENUM");
+  // }
+  // param_array_->SetEnumValue("DigitalOutput", new_bit);
+
+
+
+
   int64_t bit;
   param_array_->GetEnumValue("DigitalOutput", bit);
 
@@ -253,6 +291,7 @@ void FlirGige::CacheParams() {
   param_array_->GetFloatValue("F", F);
   param_array_->GetFloatValue("B", B);
   param_array_->GetFloatValue("O", O);
+
 
   cache_.B = B;
   cache_.F = F;

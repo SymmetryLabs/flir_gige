@@ -66,9 +66,9 @@ endmacro(Ebus_REPORT_NOT_FOUND)
 # Search user-installed locations first, so that we prefer user installs
 # to system installs where both exist.
 list(APPEND Ebus_CHECK_INCLUDE_DIRS
-    /opt/pleora/ebus_sdk/Ubuntu-12.04-x86_64/include)
+    /opt/pleora/ebus_sdk/Ubuntu-x86_64/include)
 list(APPEND Ebus_CHECK_LIBRARY_DIRS
-    /opt/pleora/ebus_sdk/Ubuntu-12.04-x86_64/lib)
+    /opt/pleora/ebus_sdk/Ubuntu-x86_64/lib)
 
 # Check general hints
 if(Ebus_HINTS AND EXISTS ${Ebus_HINTS})
@@ -87,7 +87,7 @@ if(NOT Ebus_INCLUDE_DIR OR NOT EXISTS ${Ebus_INCLUDE_DIR})
     Ebus_REPORT_NOT_FOUND(
         "Could not find ebus include directory, set Ebus_INCLUDE_DIR to "
         "path to ebus include directory,"
-        "e.g. /opt/pleora/ebus_sdk/Ubuntu-12.04-x86_64/include.")
+        "e.g. /opt/pleora/ebus_sdk/Ubuntu-x86_64/include.")
 else()
     message(STATUS "ebus include dir found: " ${Ebus_INCLUDE_DIR})
 endif()
@@ -111,7 +111,7 @@ endif()
 # called.
 set(Ebus_FOUND TRUE)
 
-# Extract ebus version from ebus_sdk/Ubuntu-12.04-x86_64/lib/libPvBase.so.x.y.z
+# Extract ebus version from ebus_sdk/Ubuntu-x86_64/lib/libPvBase.so.x.y.z
 if(Ebus_LIBRARY_DIR)
     file(GLOB Ebus_PVBASE
         RELATIVE ${Ebus_LIBRARY_DIR}

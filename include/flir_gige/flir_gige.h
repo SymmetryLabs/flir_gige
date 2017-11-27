@@ -55,6 +55,7 @@ class FlirGige {
   bool FindDevice(const std::string &ip,
                   const PvDeviceInfoGEVVec &dinfo_gev_vec);
   std::string AvailableDevice(const PvDeviceInfoGEVVec &dinfo_gev_vec) const;
+  std::string FirstDeviceIPAddress(const PvDeviceInfoGEVVec &dinfo_gev_vec) const;
   PvDeviceInfoGEVVec GatherGevDevice() const;
 
   void ConnectDevice();

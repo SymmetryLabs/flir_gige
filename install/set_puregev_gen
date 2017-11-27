@@ -1,8 +1,9 @@
 #!/bin/sh
 
-export PUREGEV_ROOT=/opt/pleora/ebus_sdk/Ubuntu-12.04-x86_64
+export PUREGEV_ROOT=/opt/pleora/ebus_sdk/Ubuntu-x86_64
 export GENICAM_ROOT=$PUREGEV_ROOT/lib/genicam
 export GENICAM_ROOT_V2_4=$GENICAM_ROOT
+export GENICAM_ROOT_V3_0=$GENICAM_ROOT
 export GENICAM_LOG_CONFIG=$GENICAM_ROOT/log/config/DefaultLogging.properties
 export GENICAM_LOG_CONFIG_V2_4=$GENICAM_LOG_CONFIG
 if [ "$HOME" = "/" ]; then

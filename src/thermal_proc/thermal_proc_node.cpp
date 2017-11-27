@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <opencv2/contrib/contrib.hpp>
+
 
 namespace flir_gige {
 
