@@ -21,20 +21,12 @@ FlirGige::FlirGige(const std::string &ip_address)
     throw std::runtime_error(std::string("PvSystem::Find Error: ") +
                              result.GetCodeString().GetAscii());
   }
-  const PvDeviceInfoGEVVec dinfo_gev_vec = GatherGevDevice();
+  const PvDeviceInfoGEVVec deviceInfoList = GatherGevDevice();
 
-  if (ip_address == "0.0.0.0") {
-    std::string first_address = FirstDeviceIPAddress(dinfo_gev_vec);
-    if (!first_address.empty() && FindDevice(first_address, dinfo_gev_vec)) {
-      ip_address_ = first_address;
-      return;
-    }
-  }
-  else if (FindDevice(ip_address, dinfo_gev_vec))
+  if (FindDevice(ip_address, deviceInfoList))
     return;
 
-  throw std::runtime_error(ip_address + " not found. Available IP Address(es): " +
-                           AvailableDevice(dinfo_gev_vec));
+  throw std::runtime_error(ip_address + " not found. Available IP Address(es): " + AvailableDevice(deviceInfoList));
 }
 
 void FlirGige::Connect() {
@@ -106,10 +98,16 @@ bool FlirGige::FindDevice(const std::string & ip, const PvDeviceInfoGEVVec & dev
   if (deviceInfoList.empty())
     return false;
 
+  bool isWildcard = ip == "0.0.0.0";
+
   // Try finding the device with the correct ip address
   for (auto deviceInfo : deviceInfoList) {
-    if (ip != deviceInfo->GetIPAddress().GetAscii())
+    if (isWildcard or ip != deviceInfo->GetIPAddress().GetAscii())
       continue;
+
+    if (isWildcard) {
+      ip_address_ = deviceInfo->GetIPAddress().GetAscii();
+    }
 
     if (!deviceInfo->IsConfigurationValid())
       continue;
@@ -127,13 +125,6 @@ bool FlirGige::FindDevice(const std::string & ip, const PvDeviceInfoGEVVec & dev
   }
 
   return false;
-}
-
-std::string FlirGige::FirstDeviceIPAddress(
-    const PvDeviceInfoGEVVec &dinfo_gev_vec) const {
-  for (const PvDeviceInfoGEV *dinfo : dinfo_gev_vec)
-    return dinfo->GetIPAddress().GetAscii();
-  return "";
 }
 
 std::string FlirGige::AvailableDevice(
