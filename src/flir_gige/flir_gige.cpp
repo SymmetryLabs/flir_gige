@@ -66,31 +66,18 @@ void FlirGige::Configure(FlirGigeDynConfig &config) {
 }
 
 FlirGige::PvDeviceInfoGEVVec FlirGige::GatherGevDevice() const {
-  const int interface_cnt = system_.GetInterfaceCount();
+  std::vector<const PvDeviceInfoGEV *> deviceInfoList;
 
-  // Go through all interfaces, but we only care about network interface
-  // For other interfaces such as usb, refer to sample code DeviceFinder.cpp
-  std::vector<const PvDeviceInfoGEV *> dinfo_gev_vec;
-  for (int i = 0; i < interface_cnt; ++i) {
-    // Get pointer to the interface
-    const PvInterface *interface = system_.GetInterface(i);
-    // Is it a PvNetworkAdapter?
-    const auto *nic = dynamic_cast<const PvNetworkAdapter *>(interface);
-    if (nic) {
-      // ROS_INFO("Interface: %s", interface->GetDisplayID().GetAscii());
-      // Go through all the devices attached to the network interface
-      const int dev_cnt = interface->GetDeviceCount();
-      for (int j = 0; j < dev_cnt; ++j) {
-        const PvDeviceInfo *dinfo = interface->GetDeviceInfo(j);
-        // Is it a GigE Vision device?
-        const auto *dinfo_gev = dynamic_cast<const PvDeviceInfoGEV *>(dinfo);
-        if (dinfo_gev) {
-          dinfo_gev_vec.push_back(dinfo_gev);
-        }
-      }
+  for (int i = 0; i < system_.GetDeviceCount(); ++i) {
+    const PvDeviceInfo * deviceInfo = system_.GetDeviceInfo(i);
+    // Is it a GigE Vision device?
+    const auto * gevDeviceInfo = dynamic_cast<const PvDeviceInfoGEV *>(deviceInfo);
+    if (gevDeviceInfo) {
+      deviceInfoList.push_back(gevDeviceInfo);
     }
   }
-  return dinfo_gev_vec;
+
+  return deviceInfoList;
 }
 
 bool FlirGige::FindDevice(const std::string & ip, const PvDeviceInfoGEVVec & deviceInfoList) {
