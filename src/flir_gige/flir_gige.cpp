@@ -101,32 +101,32 @@ FlirGige::PvDeviceInfoGEVVec FlirGige::GatherGevDevice() const {
   return dinfo_gev_vec;
 }
 
-bool FlirGige::FindDevice(const std::string &ip,
-                          const PvDeviceInfoGEVVec &dinfo_gev_vec) {
+bool FlirGige::FindDevice(const std::string & ip, const PvDeviceInfoGEVVec & deviceInfoList) {
   // Check GigE devices found on network adaptor
-  if (dinfo_gev_vec.empty()) return false;
+  if (deviceInfoList.empty())
+    return false;
 
   // Try finding the device with the correct ip address
-  const auto it = std::find_if(dinfo_gev_vec.cbegin(), dinfo_gev_vec.cend(),
-                               [&ip](const PvDeviceInfoGEV *dinfo) {
-    return ip == dinfo->GetIPAddress().GetAscii();
-  });
+  for (auto deviceInfo : deviceInfoList) {
+    if (ip != deviceInfo->GetIPAddress().GetAscii())
+      continue;
 
-  if (it == dinfo_gev_vec.end()) return false;
-  // Found device with given ip address
-  const PvDeviceInfoGEV *dinfo_gev = *it;
-  display_id_ = std::string(dinfo_gev->GetDisplayID().GetAscii());
+    if (!deviceInfo->IsConfigurationValid())
+      continue;
 
-  if (!dinfo_gev->IsConfigurationValid()) return false;
-  // Try connect and disconnect to verify
-  dinfo_ = dinfo_gev;
-  PvResult result;
+    display_id_ = std::string(deviceInfo->GetDisplayID().GetAscii());
+    dinfo_ = deviceInfo;
 
-  // Creates and connects the device controller
-  PvDevice *device = PvDevice::CreateAndConnect(dinfo_, &result);
-  if (!result.IsOK()) return false;
-  PvDevice::Free(device);
-  return true;
+    return true; // skip connection check
+
+    // Try connect and disconnect to verify
+    PvResult result;
+    PvDevice::Free(PvDevice::CreateAndConnect(deviceInfo, &result));
+    if (result.IsOK())
+      return true;
+  }
+
+  return false;
 }
 
 std::string FlirGige::FirstDeviceIPAddress(
