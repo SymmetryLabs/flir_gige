@@ -115,8 +115,6 @@ bool FlirGige::FindDevice(const std::string & ip, const PvDeviceInfoGEVVec & dev
     display_id_ = std::string(deviceInfo->GetDisplayID().GetAscii());
     dinfo_ = deviceInfo;
 
-    return true; // skip connection check
-
     // Try connect and disconnect to verify
     PvResult result;
     PvDevice::Free(PvDevice::CreateAndConnect(deviceInfo, &result));
