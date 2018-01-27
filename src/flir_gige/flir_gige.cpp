@@ -103,8 +103,10 @@ bool FlirGige::FindDevice(const std::string & ip, const PvDeviceInfoGEVVec & dev
     dinfo_ = deviceInfo;
 
     // Try connect and disconnect to verify
-    PvResult result;
-    PvDevice::Free(PvDevice::CreateAndConnect(deviceInfo, &result));
+    PvDeviceGEV device;
+    PvResult result = device.Connect(deviceInfo);
+    device.Disconnect();
+
     if (result.IsOK())
       return true;
 
