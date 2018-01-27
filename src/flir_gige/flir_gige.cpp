@@ -120,6 +120,10 @@ bool FlirGige::FindDevice(const std::string & ip, const PvDeviceInfoGEVVec & dev
     PvDevice::Free(PvDevice::CreateAndConnect(deviceInfo, &result));
     if (result.IsOK())
       return true;
+
+    std::cerr << "Skipping matching device with IP '" << ip
+        << "' on interface '" << deviceInfo->GetInterface()->GetName().GetAscii()
+        << "'." << std::endl;
   }
 
   return false;
