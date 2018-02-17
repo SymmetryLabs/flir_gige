@@ -21,7 +21,7 @@
 
     <!-- Node -->
     <node pkg="flir_gige" type="flir_gige_node" name="$(arg camera)"
-        output="$(arg output)">
+        output="$(arg output)" respawn="true">
         <param name="identifier" type="string" value="$(arg ip_address)"/>
         <param name="camera_name" type="string" value="$(arg camera_name)"/>
         <param name="calib_url" type="string" value="$(arg calib_url)"/>
